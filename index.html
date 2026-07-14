@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Rust WebAssembly Speed Test 🦀⚡</title>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: #fff; max-width: 600px; margin: 50px auto; padding: 20px; }
+        button { background: #e05a47; border: none; color: white; padding: 10px 20px; font-size: 16px; cursor: pointer; border-radius: 5px; margin: 10px 0; }
+        button:hover { background: #c84e3c; }
+        .result { background: #1e1e1e; padding: 15px; border-radius: 5px; margin-top: 15px; border-left: 5px solid #e05a47; }
+        .highlight { color: #5ae047; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Rust WebAssembly Speed Test 🦀⚡</h1>
+    <p>Calculando cantidad de números primos hasta <strong>500.000</strong> de forma iterativa.</p>
+    
+    <button id="run-btn">Iniciar Prueba de Rendimiento</button>
+
+    <div class="result" id="output" style="display: none;">
+        <p><strong>Resultados:</strong></p>
+        <p>JavaScript Puro: <span id="js-time" class="highlight">Calculando...</span></p>
+        <p>Rust (WASM): <span id="rust-time" class="highlight">Calculando...</span></p>
+        <p id="comparison"></p>
+    </div>
+
+    <script type="module">
+        // Importamos el código compilado de WebAssembly
+        import init, { count_primes } from './pkg/wasm_speed_boost.js';
+
+        // Versión idéntica de la lógica de números primos escrita en JavaScript puro
+        function jsIsPrime(n) {
+            if (n <= 1) return false;
+            if (n === 2) return true;
+            if (n % 2 === 0) return false;
+            let limit = Math.sqrt(n);
+            for (let i = 3; i <= limit; i += 2) {
+                if (n % i === 0) return false;
+            }
+            return true;
+        }
+
+        function jsCountPrimes(limit) {
+            let count = 0;
+            for (let i = 2; i < limit; i++) {
+                if (jsIsPrime(i) === true) count++;
+            }
+            return count;
+        }
+
+        document.getElementById('run-btn').addEventListener('click', async () => {
+            const limit = 500000;
+            const output = document.getElementById('output');
+            output.style.display = 'block';
+
+            // 1. Inicializar el módulo de WebAssembly
+            await init();
+
+            // 2. Correr la prueba en JavaScript Puro
+            const t0 = performance.now();
+            const jsResult = jsCountPrimes(limit);
+            const t1 = performance.now();
+            const jsTime = (t1 - t0).toFixed(2);
+            document.getElementById('js-time').innerText = `${jsTime} ms (Encontrados: ${jsResult})`;
+
+            // 3. Correr la prueba en Rust via WebAssembly
+            const t2 = performance.now();
+            const rustResult = count_primes(limit);
+            const t3 = performance.now();
+            const rustTime = (t3 - t2).toFixed(2);
+            document.getElementById('rust-time').innerText = `${rustTime} ms (Encontrados: ${rustResult})`;
+
+            // 4. Mostrar la comparación
+            const speedup = (jsTime / rustTime).toFixed(1);
+            document.getElementById('comparison').innerHTML = `¡Rust fue <strong>${speedup} veces</strong> más rápido que JavaScript puro!`;
+        });
+    </script>
+</body>
+</html>

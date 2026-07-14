@@ -1,0 +1,10 @@
+# Rust / Cargo
+/target
+**/*.rs.bk
+Cargo.lock
+
+# Wasm-pack
+/pkg
+
+# Node / Dependencias temporales si las hubiera
+node_modules/
