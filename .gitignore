@@ -1,10 +1,24 @@
-# Rust / Cargo
-/target
-**/*.rs.bk
+# --- RUST BUILD ARTIFACTS ---
+/target/
+
+# --- WASM-PACK SPECIFIC ---
+# No ignoramos /pkg/ porque Vercel necesita leer los archivos compilados en local.
+# Si existiera otra carpeta temporal de compilación de WASM, se puede ignorar acá.
+
+# --- IDE & OS TEMPORAL FILES ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# --- LOCAL LOGS & LOCKS ---
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 Cargo.lock
-
-# Wasm-pack
-/pkg
-
-# Node / Dependencias temporales si las hubiera
-node_modules/
